@@ -80,3 +80,28 @@ models/*
 *.tmp
 *.bak
 *.swp
+
+# macOS
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+
+# R
+.Rhistory
+
+# Local configuration
+config
+
+# SSH keys
+id_ed25519*
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+env/
+venv/
