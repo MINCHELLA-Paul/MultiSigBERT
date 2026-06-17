@@ -2,7 +2,7 @@
 
 This repository contains the anonymous implementation of **MultiSigBERT**, a multimodal and temporal survival analysis framework designed for modeling time-to-event outcomes from heterogeneous longitudinal clinical data.
 
-MultiSigBERT combines multimodal embedding extraction, path signature theory, graph-based clustering (Minimum Spanning Tree + spectral methods), and sparse Cox modeling to identify progression phenotypes and estimate patient-specific survival risk.
+MultiSigBERT combines multimodal embedding extraction, path signature theory and sparse Cox modeling to identify progression phenotypes and estimate patient-specific survival risk.
 
 This repository is provided for reproducibility purposes under the double-blind review policy of ECML PKDD 2026.
 
@@ -17,30 +17,33 @@ Electronic Health Records (EHR) contain heterogeneous and time-dependent informa
 - Static covariates (e.g., demographic or tumor characteristics).
 
 Classical survival models typically rely on static covariates and fail to exploit the geometric and sequential structure of longitudinal multimodal data.
+**MultiSigBERT** addresses this limitation through a unified four-stage pipeline:
 
-**MultiSigBERT** addresses this limitation through a unified five-stage pipeline:
+1. **Multimodal Embedding and Compression**
+   Each modality (textual and structured time-dependent variables) is transformed into vector representations.
 
-1. **Multimodal Embedding and Compression**  
-   Each modality (textual and structured time-dependent variables) is transformed into vector representations.  
-   - Text is encoded via a domain-specific language model.  
-   - Sentence embeddings are constructed and compressed using PCA.  
-   - Structured longitudinal variables are standardized and temporally aligned.  
-   The result is a synchronized multimodal time series for each patient.
+   * Clinical reports are encoded using a domain-specific language model.
+   * Sentence embeddings are constructed and compressed using PCA.
+   * Structured longitudinal variables are standardized and temporally aligned.
 
-2. **Signature-Based Temporal Encoding**  
-   The chronological multimodal trajectory is encoded using the path signature transform, producing fixed-dimensional vectors that capture higher-order temporal interactions.
+   The result is a synchronized multimodal trajectory for each patient.
 
-3. **Graph Construction and MST-Based Clustering**  
-   Patients are embedded in the learned signature space.  
-   A k-nearest neighbor graph is constructed, and its Minimum Spanning Tree (MST) is used to characterize the geometric backbone of inter-patient similarity.  
-   Spectral clustering is then applied to identify latent progression phenotypes.
+2. **Signature-Based Temporal Encoding**
+   The chronological multimodal trajectory is encoded using the path signature transform, yielding fixed-dimensional representations that capture temporal ordering, higher-order interactions, and nonlinear dependencies across modalities.
 
-4. **Cluster-Specific Survival Modeling**  
-   Within each identified subgroup, a LASSO-regularized Cox proportional hazards model is trained on signature features.
+3. **Sparse Survival Modeling**
+   A LASSO-regularized Cox proportional hazards model is trained directly on the signature features. The (\ell_1)-penalty promotes sparsity by selecting a subset of informative temporal descriptors, improving interpretability and mitigating overfitting in the high-dimensional setting where the number of signature features may exceed the number of patients.
 
-5. **Performance Evaluation**  
-   Model performance is assessed using discrimination and calibration metrics (C-index, time-dependent AUC, Brier Score, Integrated Brier Score).
+   The resulting linear predictor defines an individual risk score for each patient:
 
+   \[
+   \eta_i = x_i^\top \hat{\beta},
+   \]
+
+   where \(x_i\) denotes the signature representation of patient \(i\) and \(\hat{\beta}\) is the sparse coefficient vector estimated by penalized partial likelihood maximization.
+
+4. **Performance Evaluation**
+   Predictive performance is assessed using both discrimination and calibration metrics, including the Concordance Index (C-index), time-dependent Area Under the Curve (td-AUC), Brier Score, and Integrated Brier Score (IBS).
 
 
 ## Pipeline Illustration
@@ -70,7 +73,6 @@ MultiSigBERT/
 ├── src/
 │   ├── _utils.py
 │   ├── compression_pkg.py
-│   ├── clustering_pkg.py
 │   ├── descriptive_stats_pkg.py
 │   ├── metrics_plot_results_pkg.py
 │   ├── signature_pkg.py
@@ -121,9 +123,7 @@ See [data documentation](./data/README.md) for the detailed schema.
   - The main notebook [`multisigbert_study.ipynb`](./notebooks/multisigbert_study.ipynb) performs:
     - Multimodal embedding extraction and compression
     - Signature computation (configurable truncation order)
-    - kNN graph construction and MST-based clustering
-    - Spectral clustering in signature space
-    - Cluster-specific Cox model training
+    - Cox model training
     - Evaluation (C-index, td-AUC, BS, IBS)
 
 
