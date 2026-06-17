@@ -176,14 +176,3 @@ sklearn.utils._param_validation.StrOptions
 To ensure compatibility across environments, a lightweight fallback module is injected at runtime before importing `skglm`.
 
 Please see [`sklearn_patch.py`](./src/multisigbert/sklearn_param_validation_patch.py) for the corresponding implementation.
-
-
-
-## Important Notes (Double Blind Policy)
-
-- No institutional affiliations are disclosed.
-- No dataset source information is provided.
-- All identifying metadata has been removed.
-- Reported experimental results can be reproduced using appropriately formatted data.
-
-This repository is submitted anonymously for peer review.  
